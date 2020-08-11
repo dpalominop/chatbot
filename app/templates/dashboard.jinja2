@@ -1,0 +1,57 @@
+{% extends "layout.jinja2" %}
+
+{% block pagestyles %}
+    <link href="{{ url_for('static', filename='dist/css/dashboard.css') }}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://use.typekit.net/sus7rlu.css">
+{% endblock %}
+
+{% block additionalscripts %}
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <script type="text/javascript">
+      let socket = io.connect('http://' + document.domain + ':' + location.port);
+
+      socket.on( 'connect', function() {
+        let form = $( 'form' ).on( 'submit', function( e ) {
+          e.preventDefault()
+          let message = $( 'input.message' ).val()
+          socket.emit( 'message', {
+            message : message
+          } )
+          $( 'input.message' ).val( '' ).focus()
+        } )
+      } )
+      socket.on( 'response', function( msg ) {
+        console.log( msg )
+        if( msg.message ) {
+          $( 'h3' ).remove()
+          $( 'div.message_holder' ).append( '<div><b style="color: #000">'+msg.username+'</b> '+msg.message+'</div><br/>' )
+        }
+      })
+      socket.on( 'login-out', function (msg){
+          if( msg.message !== "") {
+          $( 'h3' ).remove()
+          $( 'div.message_holder' ).append( '<div><b style="color: #555">'+msg.data+'</b></div><br/>' )
+        }
+      })
+    </script>
+{% endblock %}
+
+
+{% block content %}
+    <h1>{{ body }}</h1>
+
+    {% if current_user.is_authenticated %}
+        <p>Hi {{ current_user.name }}!</p>
+        <a href="{{ url_for('main_bp.logout') }}">Log out</a>
+
+        <h3 style='color: #ccc;font-size: 30px;'>No message yet..</h3>
+        <div class="message_holder"></div>
+
+        <form action="" method="POST">
+          <input type="text" class="message" placeholder="Messages"/>
+          <input type="submit"/>
+        </form>
+    {% endif %}
+{% endblock %}
