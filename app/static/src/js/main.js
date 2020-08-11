@@ -1,5 +1,5 @@
 // Remove Alert on Close
-let alertButton = document.querySelector('.alert button');
+/*let alertButton = document.querySelector('.alert button');
 
 if (alertButton){
   alertButton.addEventListener('click', function (event) {
@@ -12,3 +12,4 @@ if (alertButton){
 
   }, false);
 }
+*/

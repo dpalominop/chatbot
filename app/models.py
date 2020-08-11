@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class User(UserMixin, db.Model):
     """Model for user accounts."""
 
-    __tablename__ = 'flasksession-users'
+    __tablename__ = 'session-users'
     id = db.Column(
         db.Integer,
         primary_key=True
@@ -57,3 +57,35 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.name)
+
+    @staticmethod
+    def get_by_email(email):
+        return User.query.filter_by(email=email).first()
+
+
+class Post(db.Model):
+    """Model for users' posts."""
+
+    __tablename__ = 'posts'
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('session-users.id', ondelete='CASCADE'),
+        nullable=False
+    )
+    text = db.Column(
+        db.Text
+    )
+    created_on = db.Column(
+        db.DateTime,
+        index=False,
+        unique=False,
+        nullable=True
+    )
+
+    @staticmethod
+    def get_posts(n):
+        return Post.query.select_from().order_by(Post.created_on.desc()).limit(n)
